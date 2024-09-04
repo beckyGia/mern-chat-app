@@ -13,6 +13,8 @@ import { app, server } from "./socket/socket.js";
 // Configure dotenv to load variables from the .env file
 dotenv.config();
 
+const __dirname = path.resolve();
+
 // Body Parser middleware
 app.use(express.json()); // to parse the incoming requests with JSON payloads (from req.body)
 app.use(express.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
@@ -25,14 +27,15 @@ connectToMongoDB();
 //SET UP PORT:
 const PORT = process.env.PORT || 5000;
 
-// app.get("/", (req, res) => {
-//   //root route http://localhost:5000/
-//   res.send("Hello World!!");
-// });
-
 //Middleware
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/users", userRoutes);
+
+app.use(express.static(path.join(__dirname, "/frontend/dist")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
+});
 
 server.listen(PORT, () => console.log(`Server Running On Port ${PORT}`));
